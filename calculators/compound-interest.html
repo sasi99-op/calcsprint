@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compound Interest Calculator – Watch Your Money Grow | CalcSprint</title>
+  <meta name="description" content="Calculate compound interest for savings or investments. See how your money grows over time with different rates and compounding frequencies.">
+  <link rel="canonical" href="https://calcsprint.com/calculators/compound-interest.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0F172A; --indigo:#6366F1; --indigo-light:#818CF8; --indigo-dim:#EEF2FF;
+      --bg:#F8FAFC; --white:#FFFFFF; --text:#0F172A; --muted:#64748B;
+      --border:#E2E8F0; --radius:14px;
+      --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    h1, h2, h3, h4, h5, h6 { font-family:'Inter',system-ui,sans-serif; }
+
+    /* Header */
+    header { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .header-inner { max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; gap:20px; }
+    .logo { font-size:1.35rem; font-weight:800; text-decoration:none; color:var(--navy); letter-spacing:-.5px; }
+    .logo span { color:var(--indigo); }
+    .search-wrap { flex:1; max-width:400px; position:relative; }
+    .search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); pointer-events:none; }
+    #siteSearch { width:100%; height:38px; padding:0 12px 0 36px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:.88rem; background:var(--bg); outline:none; }
+    #siteSearch:focus { border-color:var(--indigo); }
+    .back-link { margin-left:auto; font-size:.85rem; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px; }
+    .back-link:hover { color:var(--indigo); }
+
+    /* Layout */
+    .page-wrap { max-width:1200px; margin:0 auto; padding:36px 24px; display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:start; }
+    @media(max-width:900px) { .page-wrap { grid-template-columns:1fr; } }
+
+    /* Breadcrumb */
+    .breadcrumb { font-size:.8rem; color:var(--muted); margin-bottom:20px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .breadcrumb a { color:var(--indigo); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Calculator card */
+    .calc-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:32px; box-shadow:var(--shadow); }
+    .calc-header { margin-bottom:28px; }
+    .calc-badge { display:inline-block; font-size:.75rem; font-weight:600; padding:3px 10px; border-radius:100px; margin-bottom:10px; }
+    .calc-header h1 { font-size:1.6rem; font-weight:800; letter-spacing:-.5px; margin-bottom:6px; }
+    .calc-header p { font-size:.9rem; color:var(--muted); }
+
+    /* Standard form styles */
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+    .form-group label { font-size:.82rem; font-weight:600; color:var(--navy); display:flex; justify-content:space-between; }
+    .form-group label span { font-weight:400; color:var(--indigo); font-size:.85rem; }
+    .form-group input, .form-group select {
+      height:48px; padding:0 14px; border:1.5px solid var(--border); border-radius:10px;
+      font-family:inherit; font-size:1rem; outline:none; background:var(--bg); width:100%;
+      transition:border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color:var(--indigo); background:var(--white); }
+    .form-group .hint { font-size:.75rem; color:var(--muted); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    @media(max-width:600px) { .form-row { grid-template-columns:1fr; } }
+    .range-input { accent-color:var(--indigo); width:100%; margin-top:6px; }
+
+    .calc-btn {
+      width:100%; height:52px; background:var(--indigo); color:#fff; border:none;
+      border-radius:10px; font-family:inherit; font-size:1rem; font-weight:700;
+      cursor:pointer; transition:background .2s, transform .1s; margin-top:8px;
+    }
+    .calc-btn:hover { background:#4F46E5; }
+    .calc-btn:active { transform:scale(.98); }
+
+    /* Result styles */
+    .result-box { margin-top:28px; padding:24px; border-radius:12px; border:2px solid var(--border); background:var(--bg); display:none; }
+    .result-box.show { display:block; }
+
+    /* Info section */
+    .info-section { margin-top:32px; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .info-section h2 { font-size:1.15rem; font-weight:700; margin-bottom:12px; margin-top:24px; }
+    .info-section h2:first-child { margin-top:0; }
+    .info-section p, .info-section li { font-size:.88rem; color:var(--muted); line-height:1.7; }
+    .info-section ul { padding-left:18px; }
+    .info-table { width:100%; border-collapse:collapse; margin:16px 0; font-size:.85rem; }
+    .info-table th { background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 14px; text-align:left; }
+    .info-table td { padding:9px 14px; border-bottom:1px solid var(--border); }
+    .info-table tr:last-child td { border-bottom:none; }
+
+    /* Sidebar */
+    .sidebar { display:flex; flex-direction:column; gap:20px; }
+    .ad-box { background:linear-gradient(135deg,#EEF2FF,#F8FAFC); border:1.5px dashed var(--indigo-light); border-radius:12px; padding:16px; text-align:center; color:var(--muted); font-size:.78rem; }
+    .ad-box-tall { min-height:250px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
+    .related-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+    .related-card h3 { font-size:.9rem; font-weight:700; margin-bottom:12px; }
+    .related-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .related-list li a { font-size:.85rem; color:var(--indigo); text-decoration:none; display:flex; align-items:center; gap:7px; }
+    .related-list li a:hover { text-decoration:underline; }
+
+    /* Footer */
+    footer { background:var(--navy); color:#94A3B8; padding:32px 24px; margin-top:48px; text-align:center; font-size:.8rem; }
+    footer a { color:var(--indigo-light); text-decoration:none; }
+
+    /* Custom overrides */
+    
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Calc<span>Sprint</span></a>
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="siteSearch" type="search" placeholder="Search calculators…" aria-label="Search" onkeydown="if(event.key==='Enter'&&this.value){window.location='../index.html?q='+encodeURIComponent(this.value)}">
+    </div>
+    <a href="../index.html" class="back-link">← All Calculators</a>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">CalcSprint</a> › <a href="../index.html#calculators">Finance</a> › Compound Interest Calculator
+    </nav>
+
+    <div class="calc-card">
+      <div class="calc-header">
+        <span class="calc-badge" style="background:#FEF3C7; color:#92400E">📈 Finance</span>
+        <h1>Compound Interest Calculator</h1>
+        <p>See how your savings or investments grow over time with the power of compound interest.</p>
+      </div>
+
+      
+      <div class="form-group">
+        <label for="currency">Currency</label>
+        <select id="currency" onchange="calc()">
+          <option value="₹" selected>INR (₹)</option>
+          <option value="$">USD ($)</option>
+          <option value="€">EUR (€)</option>
+          <option value="£">GBP (£)</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="principal">Principal Amount <span id="pVal">10,000</span></label>
+          <input type="number" id="principal" value="10000" min="1" oninput="calc()">
+        </div>
+        <div class="form-group">
+          <label for="monthly">Monthly Contribution <span id="mVal">100</span></label>
+          <input type="number" id="monthly" value="100" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="rate">Annual Interest Rate <span id="rVal">7%</span></label>
+        <input type="number" id="rate" value="7" min="0.1" max="50" step="0.1" oninput="calc();document.getElementById('rVal').textContent=this.value+'%'">
+        <input type="range" class="range-input" min="1" max="20" step="0.5" value="7" oninput="document.getElementById('rate').value=this.value;calc();document.getElementById('rVal').textContent=this.value+'%'">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="years">Time Period (years) <span id="yVal">10 yrs</span></label>
+          <input type="number" id="years" value="10" min="1" max="50" oninput="calc();document.getElementById('yVal').textContent=this.value+' yrs'">
+          <input type="range" class="range-input" min="1" max="40" value="10" oninput="document.getElementById('years').value=this.value;calc();document.getElementById('yVal').textContent=this.value+' yrs'">
+        </div>
+        <div class="form-group">
+          <label for="freq">Compounding Frequency</label>
+          <select id="freq" onchange="calc()">
+            <option value="1">Annually</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </div>
+      </div>
+
+
+      
+      <div class="results-grid" id="resultsGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:24px;">
+        <div class="r-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center;"><div class="r-num" id="rFinal" style="font-size:1.35rem; font-weight:800; color:var(--indigo);">—</div><div class="r-lbl" style="font-size:.72rem; color:var(--muted); margin-top:2px;">Final Balance</div></div>
+        <div class="r-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center;"><div class="r-num" id="rInterest" style="font-size:1.35rem; font-weight:800; color:var(--indigo);">—</div><div class="r-lbl" style="font-size:.72rem; color:var(--muted); margin-top:2px;">Interest Earned</div></div>
+        <div class="r-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center;"><div class="r-num" id="rContrib" style="font-size:1.35rem; font-weight:800; color:var(--indigo);">—</div><div class="r-lbl" style="font-size:.72rem; color:var(--muted); margin-top:2px;">Total Contributed</div></div>
+      </div>
+
+      <div class="chart-wrap" style="margin-top:20px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <h3 style="font-size:.85rem; font-weight:700; margin-bottom:12px; color:var(--muted);">Growth over time</h3>
+        <div class="bar-chart" id="barChart" style="display:flex; align-items:flex-end; gap:3px; height:120px;"></div>
+        <div class="chart-legend" style="display:flex; gap:14px; margin-top:10px; font-size:.75rem; color:var(--muted);">
+          <div class="leg" style="display:flex; align-items:center; gap:5px;"><div class="leg-dot" style="width:10px; height:10px; border-radius:2px; background:#E2E8F0"></div>Principal + Contributions</div>
+          <div class="leg" style="display:flex; align-items:center; gap:5px;"><div class="leg-dot" style="width:10px; height:10px; border-radius:2px; background:var(--indigo)"></div>Interest</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-section">
+      
+      <h2>The Compound Interest Formula</h2>
+      <p>For periodic contributions: <code>A = P(1 + r/n)^(nt) + PMT × [((1 + r/n)^(nt) − 1) / (r/n)]</code></p>
+      <p>Where <strong>P</strong> = principal, <strong>r</strong> = annual rate, <strong>n</strong> = compounding periods/year, <strong>t</strong> = years, <strong>PMT</strong> = monthly payment.</p>
+
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="ad-box ad-box-tall">
+      AdSense 300×250<br>Medium Rectangle
+    </div>
+
+    <div class="related-card">
+      <h3>Related Calculators</h3>
+      <ul class="related-list">
+        <li><a href="loan.html">🏦 Loan Calculator</a></li>
+<li><a href="roi.html">💹 ROI Calculator</a></li>
+<li><a href="mortgage.html">🏠 Mortgage Calculator</a></li>
+
+        <li><a href="../index.html#calculators">📋 All Calculators</a></li>
+      </ul>
+    </div>
+
+    <div class="ad-box" style="min-height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
+      AdSense 300×600<br>Half Page
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <div style="margin-bottom: 16px; display: flex; justify-content: center; gap: 24px;">
+    <a href="../about.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">About Us</a>
+    <a href="../contact.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Contact</a>
+    <a href="../privacy.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Privacy Policy</a>
+  </div>
+  <p>© 2025 <a href="../index.html">CalcSprint</a> · Results are estimates only. Always consult a professional for critical decisions.</p>
+</footer>
+
+<script>
+
+const fmtK = n => {
+  const curr = document.getElementById('currency').value;
+  return n >= 1e6 ? curr+(n/1e6).toFixed(2)+'M' : n >= 1000 ? curr+(n/1000).toFixed(1)+'k' : curr+n.toFixed(2);
+};
+
+function calc() {
+  const curr = document.getElementById('currency').value;
+  const P = parseFloat(document.getElementById('principal').value)||0;
+  const pmt = parseFloat(document.getElementById('monthly').value)||0;
+  const r = parseFloat(document.getElementById('rate').value)||0;
+  const t = parseInt(document.getElementById('years').value)||1;
+  const n = parseInt(document.getElementById('freq').value);
+
+  document.getElementById('pVal').textContent = curr + P.toLocaleString();
+  document.getElementById('mVal').textContent = curr + pmt.toLocaleString();
+
+  const rn = r/100/n;
+  const nt = n*t;
+  const principalGrowth = P * Math.pow(1+rn, nt);
+  const pmtGrowth = pmt > 0 ? pmt * (Math.pow(1+rn,nt)-1)/rn : 0;
+  const final = principalGrowth + pmtGrowth;
+  const totalContrib = P + pmt*12*t;
+  const interest = final - totalContrib;
+
+  document.getElementById('rFinal').textContent = fmtK(final);
+  document.getElementById('rInterest').textContent = fmtK(interest);
+  document.getElementById('rContrib').textContent = fmtK(totalContrib);
+
+  // Bar chart
+  const steps = Math.min(t, 10);
+  const points = [];
+  for (let i=1; i<=steps; i++) {
+    const yr = Math.round(t*i/steps);
+    const nt2 = n*yr;
+    const pg2 = P * Math.pow(1+rn,nt2);
+    const mg2 = pmt > 0 ? pmt*(Math.pow(1+rn,nt2)-1)/rn : 0;
+    const f2 = pg2+mg2;
+    const c2 = P+pmt*12*yr;
+    points.push({yr, total:f2, contrib:c2});
+  }
+  const maxVal = points[points.length-1].total;
+  const chart = document.getElementById('barChart');
+  chart.innerHTML = points.map(p => {
+    const totalH = (p.total/maxVal*100).toFixed(1);
+    const contribH = (p.contrib/maxVal*100).toFixed(1);
+    const intH = (totalH - contribH).toFixed(1);
+    return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; height:100%;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%">
+        <div style="background:var(--indigo); border-radius:3px 3px 0 0; width:100%; flex-shrink:0; transition:height .4s; height:${intH}%"></div>
+        <div style="background:#E2E8F0; border-radius:3px 3px 0 0; width:100%; flex-shrink:0; transition:height .4s; height:${contribH}%"></div>
+      </div>
+      <div style="font-size:.6rem; color:var(--muted); margin-top:4px;">Yr ${p.yr}</div>
+    </div>`;
+  }).join('');
+}
+calc();
+
+</script>
+</body>
+</html>

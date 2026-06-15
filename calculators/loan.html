@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Calculator – Monthly Payment & Amortization | CalcSprint</title>
+  <meta name="description" content="Calculate monthly loan payments, total interest, and see a full amortization schedule. Works for personal loans, auto loans, and more.">
+  <link rel="canonical" href="https://calcsprint.com/calculators/loan.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0F172A; --indigo:#6366F1; --indigo-light:#818CF8; --indigo-dim:#EEF2FF;
+      --bg:#F8FAFC; --white:#FFFFFF; --text:#0F172A; --muted:#64748B;
+      --border:#E2E8F0; --radius:14px;
+      --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    h1, h2, h3, h4, h5, h6 { font-family:'Inter',system-ui,sans-serif; }
+
+    /* Header */
+    header { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .header-inner { max-width:1200px; margin:0 auto; padding:0 24px; height:64px; display:flex; align-items:center; gap:20px; }
+    .logo { font-size:1.35rem; font-weight:800; text-decoration:none; color:var(--navy); letter-spacing:-.5px; }
+    .logo span { color:var(--indigo); }
+    .search-wrap { flex:1; max-width:400px; position:relative; }
+    .search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); pointer-events:none; }
+    #siteSearch { width:100%; height:38px; padding:0 12px 0 36px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:.88rem; background:var(--bg); outline:none; }
+    #siteSearch:focus { border-color:var(--indigo); }
+    .back-link { margin-left:auto; font-size:.85rem; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:5px; }
+    .back-link:hover { color:var(--indigo); }
+
+    /* Layout */
+    .page-wrap { max-width:1200px; margin:0 auto; padding:36px 24px; display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:start; }
+    @media(max-width:900px) { .page-wrap { grid-template-columns:1fr; } }
+
+    /* Breadcrumb */
+    .breadcrumb { font-size:.8rem; color:var(--muted); margin-bottom:20px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .breadcrumb a { color:var(--indigo); text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+
+    /* Calculator card */
+    .calc-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:32px; box-shadow:var(--shadow); }
+    .calc-header { margin-bottom:28px; }
+    .calc-badge { display:inline-block; font-size:.75rem; font-weight:600; padding:3px 10px; border-radius:100px; margin-bottom:10px; }
+    .calc-header h1 { font-size:1.6rem; font-weight:800; letter-spacing:-.5px; margin-bottom:6px; }
+    .calc-header p { font-size:.9rem; color:var(--muted); }
+
+    /* Standard form styles */
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+    .form-group label { font-size:.82rem; font-weight:600; color:var(--navy); display:flex; justify-content:space-between; }
+    .form-group label span { font-weight:400; color:var(--indigo); font-size:.85rem; }
+    .form-group input, .form-group select {
+      height:48px; padding:0 14px; border:1.5px solid var(--border); border-radius:10px;
+      font-family:inherit; font-size:1rem; outline:none; background:var(--bg); width:100%;
+      transition:border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color:var(--indigo); background:var(--white); }
+    .form-group .hint { font-size:.75rem; color:var(--muted); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    @media(max-width:600px) { .form-row { grid-template-columns:1fr; } }
+    .range-input { accent-color:var(--indigo); width:100%; margin-top:6px; }
+
+    .calc-btn {
+      width:100%; height:52px; background:var(--indigo); color:#fff; border:none;
+      border-radius:10px; font-family:inherit; font-size:1rem; font-weight:700;
+      cursor:pointer; transition:background .2s, transform .1s; margin-top:8px;
+    }
+    .calc-btn:hover { background:#4F46E5; }
+    .calc-btn:active { transform:scale(.98); }
+
+    /* Result styles */
+    .result-box { margin-top:28px; padding:24px; border-radius:12px; border:2px solid var(--border); background:var(--bg); display:none; }
+    .result-box.show { display:block; }
+
+    /* Info section */
+    .info-section { margin-top:32px; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .info-section h2 { font-size:1.15rem; font-weight:700; margin-bottom:12px; margin-top:24px; }
+    .info-section h2:first-child { margin-top:0; }
+    .info-section p, .info-section li { font-size:.88rem; color:var(--muted); line-height:1.7; }
+    .info-section ul { padding-left:18px; }
+    .info-table { width:100%; border-collapse:collapse; margin:16px 0; font-size:.85rem; }
+    .info-table th { background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 14px; text-align:left; }
+    .info-table td { padding:9px 14px; border-bottom:1px solid var(--border); }
+    .info-table tr:last-child td { border-bottom:none; }
+
+    /* Sidebar */
+    .sidebar { display:flex; flex-direction:column; gap:20px; }
+    .ad-box { background:linear-gradient(135deg,#EEF2FF,#F8FAFC); border:1.5px dashed var(--indigo-light); border-radius:12px; padding:16px; text-align:center; color:var(--muted); font-size:.78rem; }
+    .ad-box-tall { min-height:250px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
+    .related-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+    .related-card h3 { font-size:.9rem; font-weight:700; margin-bottom:12px; }
+    .related-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .related-list li a { font-size:.85rem; color:var(--indigo); text-decoration:none; display:flex; align-items:center; gap:7px; }
+    .related-list li a:hover { text-decoration:underline; }
+
+    /* Footer */
+    footer { background:var(--navy); color:#94A3B8; padding:32px 24px; margin-top:48px; text-align:center; font-size:.8rem; }
+    footer a { color:var(--indigo-light); text-decoration:none; }
+
+    /* Custom overrides */
+    
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Calc<span>Sprint</span></a>
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="siteSearch" type="search" placeholder="Search calculators…" aria-label="Search" onkeydown="if(event.key==='Enter'&&this.value){window.location='../index.html?q='+encodeURIComponent(this.value)}">
+    </div>
+    <a href="../index.html" class="back-link">← All Calculators</a>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">CalcSprint</a> › <a href="../index.html#calculators">Finance</a> › Loan Calculator
+    </nav>
+
+    <div class="calc-card">
+      <div class="calc-header">
+        <span class="calc-badge" style="background:#FEF3C7; color:#92400E">💰 Finance</span>
+        <h1>Loan Calculator</h1>
+        <p>Calculate your monthly payment, total interest, and view a full amortization schedule for any loan.</p>
+      </div>
+
+      
+      <div class="form-group">
+        <label for="currency">Currency</label>
+        <select id="currency" onchange="syncVal()">
+          <option value="₹" selected>INR (₹)</option>
+          <option value="$">USD ($)</option>
+          <option value="€">EUR (€)</option>
+          <option value="£">GBP (£)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="principal">Loan Amount <span id="principalVal">10,000</span></label>
+        <div style="position:relative;">
+          <span id="currSym" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:500;">₹</span>
+          <input type="number" id="principal" value="10000" min="100" max="10000000" oninput="syncVal()" style="padding-left:26px;">
+        </div>
+        <input type="range" class="range-input" id="principalRange" min="1000" max="500000" step="1000" value="10000" oninput="syncRange('principal')">
+      </div>
+
+      <div class="form-group">
+        <label for="rate">Annual Interest Rate <span id="rateVal">6.5%</span></label>
+        <input type="number" id="rate" value="6.5" min="0.1" max="50" step="0.1" oninput="syncVal()">
+        <input type="range" class="range-input" id="rateRange" min="1" max="30" step="0.1" value="6.5" oninput="syncRange('rate')">
+      </div>
+
+      <div class="form-group">
+        <label for="term">Loan Term <span id="termVal">36 months</span></label>
+        <select id="term" onchange="syncVal()">
+          <option value="12">1 year (12 months)</option>
+          <option value="24">2 years (24 months)</option>
+          <option value="36" selected>3 years (36 months)</option>
+          <option value="48">4 years (48 months)</option>
+          <option value="60">5 years (60 months)</option>
+          <option value="72">6 years (72 months)</option>
+          <option value="84">7 years (84 months)</option>
+          <option value="120">10 years (120 months)</option>
+          <option value="180">15 years (180 months)</option>
+          <option value="240">20 years (240 months)</option>
+          <option value="360">30 years (360 months)</option>
+        </select>
+      </div>
+
+      <button class="calc-btn" onclick="calcLoan()">Calculate Payment</button>
+
+
+      
+      <div class="results-grid" id="resultsGrid" style="display:none; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:24px;">
+        <div class="result-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center;">
+          <div class="r-num" id="monthlyPmt" style="font-size:1.5rem; font-weight:800; color:var(--indigo);">—</div>
+          <div class="r-lbl" style="font-size:.75rem; color:var(--muted); margin-top:3px;">Monthly Payment</div>
+        </div>
+        <div class="result-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center;">
+          <div class="r-num" id="totalInterest" style="font-size:1.5rem; font-weight:800; color:var(--indigo);">—</div>
+          <div class="r-lbl" style="font-size:.75rem; color:var(--muted); margin-top:3px;">Total Interest</div>
+        </div>
+        <div class="result-item" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center;">
+          <div class="r-num" id="totalCost" style="font-size:1.5rem; font-weight:800; color:var(--indigo);">—</div>
+          <div class="r-lbl" style="font-size:.75rem; color:var(--muted); margin-top:3px;">Total Cost</div>
+        </div>
+      </div>
+
+      <div class="breakdown-wrap" id="breakdown" style="display:none; margin-top:22px; padding:18px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+        <svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#E2E8F0" stroke-width="18"/>
+          <circle id="donutPrincipal" cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="18" stroke-dasharray="251.2" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+          <circle id="donutInterest" cx="50" cy="50" r="40" fill="none" stroke="#FBBF24" stroke-width="18" stroke-dasharray="251.2" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div class="breakdown-legend">
+          <div class="leg-item" style="display:flex; align-items:center; gap:8px; font-size:.83rem;"><div class="leg-dot" style="width:12px; height:12px; border-radius:50%; flex-shrink:0; background:#6366F1"></div><span id="legPrincipal">Principal: —</span></div>
+          <div class="leg-item" style="display:flex; align-items:center; gap:8px; font-size:.83rem;"><div class="leg-dot" style="width:12px; height:12px; border-radius:50%; flex-shrink:0; background:#FBBF24"></div><span id="legInterest">Interest: —</span></div>
+        </div>
+      </div>
+
+      <div class="amort-section" id="amortSection" style="display:none; margin-top:32px;">
+        <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">Amortization Schedule</h2>
+        <div class="amort-table-wrap" style="max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;">
+          <table class="amort-table" style="width:100%; border-collapse:collapse; font-size:.82rem;">
+            <thead><tr><th style="position:sticky; top:0; background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 12px; text-align:left;">Month</th><th style="position:sticky; top:0; background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 12px; text-align:right;">Payment</th><th style="position:sticky; top:0; background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 12px; text-align:right;">Principal</th><th style="position:sticky; top:0; background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 12px; text-align:right;">Interest</th><th style="position:sticky; top:0; background:var(--indigo-dim); color:var(--indigo); font-weight:600; padding:10px 12px; text-align:right;">Balance</th></tr></thead>
+            <tbody id="amortBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-section">
+      
+      <h2>How is the monthly payment calculated?</h2>
+      <p>The standard loan payment formula is: <code>P × [r(1+r)^n] / [(1+r)^n - 1]</code></p>
+      <p style="margin-top:8px">Where <strong>P</strong> = principal, <strong>r</strong> = monthly interest rate (annual ÷ 12), and <strong>n</strong> = number of payments. This is called a fully-amortizing loan — each payment covers interest first, then reduces the principal balance.</p>
+
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="ad-box ad-box-tall">
+      AdSense 300×250<br>Medium Rectangle
+    </div>
+
+    <div class="related-card">
+      <h3>Related Calculators</h3>
+      <ul class="related-list">
+        <li><a href="mortgage.html">🏠 Mortgage Calculator</a></li>
+<li><a href="compound-interest.html">📈 Compound Interest</a></li>
+<li><a href="roi.html">💹 ROI Calculator</a></li>
+
+        <li><a href="../index.html#calculators">📋 All Calculators</a></li>
+      </ul>
+    </div>
+
+    <div class="ad-box" style="min-height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
+      AdSense 300×600<br>Half Page
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <div style="margin-bottom: 16px; display: flex; justify-content: center; gap: 24px;">
+    <a href="../about.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">About Us</a>
+    <a href="../contact.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Contact</a>
+    <a href="../privacy.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Privacy Policy</a>
+  </div>
+  <p>© 2025 <a href="../index.html">CalcSprint</a> · Results are estimates only. Always consult a professional for critical decisions.</p>
+</footer>
+
+<script>
+
+const fmt = n => {
+  const curr = document.getElementById('currency').value;
+  return curr + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+};
+const fmtK = n => {
+  const curr = document.getElementById('currency').value;
+  return n >= 1000 ? curr + (n/1000).toFixed(1) + 'k' : fmt(n);
+};
+
+function syncRange(field) {
+  const r = document.getElementById(field+'Range');
+  const i = document.getElementById(field);
+  i.value = r.value;
+  syncVal();
+}
+
+function syncVal() {
+  const p = parseFloat(document.getElementById('principal').value)||0;
+  const r = parseFloat(document.getElementById('rate').value)||0;
+  const t = document.getElementById('term').value;
+  const curr = document.getElementById('currency').value;
+  
+  document.getElementById('currSym').textContent = curr;
+  document.getElementById('principalRange').value = p;
+  document.getElementById('rateRange').value = r;
+  document.getElementById('principalVal').textContent = curr + p.toLocaleString();
+  document.getElementById('rateVal').textContent = r + '%';
+  document.getElementById('termVal').textContent = t + ' months';
+  calcLoan();
+}
+
+function calcLoan() {
+  const P = parseFloat(document.getElementById('principal').value);
+  const annualRate = parseFloat(document.getElementById('rate').value);
+  const n = parseInt(document.getElementById('term').value);
+  if (!P || !annualRate || !n) return;
+
+  const r = annualRate / 100 / 12;
+  const pmt = P * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1);
+  const totalPaid = pmt * n;
+  const totalInt = totalPaid - P;
+
+  document.getElementById('monthlyPmt').textContent = fmt(pmt);
+  document.getElementById('totalInterest').textContent = fmtK(totalInt);
+  document.getElementById('totalCost').textContent = fmtK(totalPaid);
+  document.getElementById('resultsGrid').style.display = 'grid';
+  document.getElementById('breakdown').style.display = 'flex';
+  document.getElementById('amortSection').style.display = 'block';
+  document.getElementById('legPrincipal').textContent = 'Principal: ' + fmt(P);
+  document.getElementById('legInterest').textContent = 'Interest: ' + fmt(totalInt);
+
+  // Donut chart
+  const C = 251.2;
+  const pctP = P / totalPaid;
+  document.getElementById('donutPrincipal').setAttribute('stroke-dasharray', (C*pctP).toFixed(1) + ' ' + (C*(1-pctP)).toFixed(1));
+  document.getElementById('donutInterest').setAttribute('stroke-dasharray', (C*(1-pctP)).toFixed(1) + ' ' + (C*pctP).toFixed(1));
+  document.getElementById('donutInterest').setAttribute('stroke-dashoffset', (-C*pctP).toFixed(1));
+
+  // Amortization
+  let bal = P;
+  const rows = [];
+  for (let i=1; i<=n; i++) {
+    const intPmt = bal * r;
+    const prinPmt = pmt - intPmt;
+    bal -= prinPmt;
+    rows.push(`<tr><td style="padding:8px 12px; border-bottom:1px solid var(--border); text-align:left;">${i}</td><td style="padding:8px 12px; border-bottom:1px solid var(--border); text-align:right;">${fmt(pmt)}</td><td style="padding:8px 12px; border-bottom:1px solid var(--border); text-align:right;">${fmt(prinPmt)}</td><td style="padding:8px 12px; border-bottom:1px solid var(--border); text-align:right;">${fmt(intPmt)}</td><td style="padding:8px 12px; border-bottom:1px solid var(--border); text-align:right;">${fmt(Math.max(0,bal))}</td></tr>`);
+  }
+  document.getElementById('amortBody').innerHTML = rows.join('');
+}
+
+syncVal();
+
+</script>
+</body>
+</html>

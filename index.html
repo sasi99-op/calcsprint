@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalcSprint – Fast, Free, Interactive Online Calculators</title>
+  <meta name="description" content="Calculate BMI, loan monthly payments, percentages, compound interest, split bill tips, ages, and unit conversions in real-time. Free online tools.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0F172A; --indigo:#6366F1; --indigo-light:#818CF8; --indigo-dim:#EEF2FF;
+      --bg:#F8FAFC; --white:#FFFFFF; --text:#0F172A; --muted:#64748B;
+      --border:#E2E8F0; --radius:14px;
+      --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    }
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    h1, h2, h3, h4, h5, h6{font-family:'Inter',system-ui,sans-serif}
+    
+    /* Header */
+    header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .header-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-size:1.35rem;font-weight:800;text-decoration:none;color:var(--navy);letter-spacing:-.5px}
+    .logo span{color:var(--indigo)}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{font-size:.85rem;color:var(--muted);text-decoration:none;font-weight:500;transition:color .15s}
+    .nav-links a:hover{color:var(--indigo)}
+    
+    /* Hero Ticker Section */
+    .hero-sec{background:linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);color:#fff;padding:64px 24px;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center}
+    @media(max-width:900px){.hero-sec{padding:40px 24px}.hero-inner{grid-template-columns:1fr;gap:32px}}
+    
+    .hero-left h1{font-size:2.8rem;font-weight:800;line-height:1.15;letter-spacing:-1.5px;margin-bottom:16px}
+    .hero-left h1 span{color:var(--indigo-light)}
+    .hero-left p{font-size:1.05rem;color:#94A3B8;margin-bottom:28px;max-width:520px}
+    
+    .search-box-wrap{position:relative;max-width:480px}
+    .search-box-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none}
+    #heroSearch{width:100%;height:52px;padding:0 16px 0 48px;border:none;border-radius:10px;font-family:inherit;font-size:1rem;color:var(--navy);outline:none;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+    
+    /* Speed Ticker Widget */
+    .ticker-widget{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,0.3);backdrop-filter:blur(4px);position:relative;overflow:hidden}
+    .ticker-header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:12px;margin-bottom:18px}
+    .ticker-dot-wrap{display:flex;gap:6px}
+    .ticker-dot{width:10px;height:10px;border-radius:50%}
+    .ticker-title{font-size:.72rem;font-family:monospace;color:#64748B;letter-spacing:1px}
+    
+    .ticker-solve-task{font-family:monospace;font-size:1.15rem;color:#38BDF8;min-height:28px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .ticker-loader{height:4px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;margin-bottom:14px;display:none}
+    .ticker-loader-bar{height:100%;background:var(--indigo-light);width:0%;transition:width 0.4s ease}
+    .ticker-result{font-size:1.6rem;font-weight:800;color:#34D399;font-family:monospace;min-height:40px;display:flex;align-items:center}
+    .cursor{display:inline-block;width:2px;height:18px;background:#38BDF8;animation:blink .7s infinite}
+    @keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+
+    /* Main Content */
+    .main-content{max-width:1200px;margin:0 auto;padding:48px 24px}
+    
+    /* Filter Bar */
+    .filter-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;gap:20px;flex-wrap:wrap}
+    .category-filters{display:flex;gap:6px;flex-wrap:wrap}
+    .filter-btn{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--white);font-family:inherit;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+    .filter-btn:hover,.filter-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+    
+    .grid-count{font-size:.85rem;color:var(--muted);font-weight:500}
+    
+    /* Grid */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:24px}
+    .calc-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);text-decoration:none;color:inherit;transition:transform .2s, border-color .2s;display:flex;flex-direction:column;gap:12px;position:relative}
+    .calc-card:hover{transform:translateY(-4px);border-color:var(--indigo-light)}
+    
+    .card-top{display:flex;justify-content:space-between;align-items:flex-start}
+    .card-icon{font-size:2rem}
+    .card-cat-badge{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:100px}
+    
+    .calc-card h3{font-size:1.05rem;font-weight:800;color:var(--navy);letter-spacing:-.3px}
+    .calc-card p{font-size:.85rem;color:var(--muted);line-height:1.5;flex-grow:1}
+    
+    .card-footer{display:flex;align-items:center;font-size:.8rem;color:var(--indigo);font-weight:700;margin-top:4px}
+    .card-footer svg{transition:transform .15s}
+    .calc-card:hover .card-footer svg{transform:translateX(3px)}
+    
+    .no-results{text-align:center;padding:48px 24px;display:none}
+    .no-results h3{font-size:1.2rem;margin-bottom:8px}
+    .no-results p{color:var(--muted);font-size:.9rem}
+
+    /* Footer */
+    footer{background:var(--navy);color:#94A3B8;padding:48px 24px;text-align:center;font-size:.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+    footer a{color:#fff;text-decoration:none;font-weight:600}
+    footer a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Calc<span>Sprint</span></a>
+    <div class="nav-links">
+      <a href="#calculators">All Tools</a>
+      <a href="calculators/loan.html">Finance</a>
+      <a href="calculators/bmi.html">Health</a>
+    </div>
+  </div>
+</header>
+
+<div class="hero-sec">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <h1>Calculate at <span>Sprint Speed</span></h1>
+      <p>Fast, interactive, and completely free online calculators. Get instant answers for finance, health, math, and everyday equations.</p>
+      <div class="search-box-wrap">
+        <svg width="18" height="18" fill="none" stroke="#64748B" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="heroSearch" type="search" placeholder="Type to search calculators (e.g. loan, BMI, age)..." aria-label="Search calculators" oninput="handleSearch(this.value)">
+      </div>
+    </div>
+    
+    <!-- Animated speed ticker -->
+    <div class="ticker-widget">
+      <div class="ticker-header">
+        <div class="ticker-dot-wrap">
+          <div class="ticker-dot" style="background:#EF4444"></div>
+          <div class="ticker-dot" style="background:#FBBF24"></div>
+          <div class="ticker-dot" style="background:#10B981"></div>
+        </div>
+        <div class="ticker-title">CALCSPRINT_ENGINE // ACTIVE</div>
+      </div>
+      <div class="ticker-solve-task" id="tickerTask">Solve: <span id="typedTask"></span><span class="cursor"></span></div>
+      <div class="ticker-loader" id="tickerLoader"><div class="ticker-loader-bar" id="tickerLoaderBar"></div></div>
+      <div class="ticker-result" id="tickerResult"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-content" id="calculators">
+  <div class="filter-bar">
+    <div class="category-filters">
+      <button class="filter-btn active" onclick="filterCat('all')">All</button>
+      <button class="filter-btn" onclick="filterCat('Finance')">💰 Finance</button>
+      <button class="filter-btn" onclick="filterCat('Health')">🏃 Health</button>
+      <button class="filter-btn" onclick="filterCat('Math')">📐 Math</button>
+      <button class="filter-btn" onclick="filterCat('Everyday')">📅 Everyday</button>
+      <button class="filter-btn" onclick="filterCat('Science')">⚡ Science</button>
+      <button class="filter-btn" onclick="filterCat('Time')">🌐 Time</button>
+    </div>
+    <div class="grid-count" id="gridCount">Showing 26 calculators</div>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+    <a href="calculators/bmi.html" class="calc-card" data-cat="Health" data-keywords="bmi body mass index weight height health healthy range">
+      <div class="card-top">
+        <span class="card-icon">🏃</span>
+        <span class="card-cat-badge" style="background:#D1FAE5;color:#065F46">Health</span>
+      </div>
+      <h3>BMI Calculator</h3>
+      <p>Enter your height and weight to instantly find out your Body Mass Index category.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+    
+    <a href="calculators/loan.html" class="calc-card" data-cat="Finance" data-keywords="loan monthly payment interest amortization schedule car auto personal">
+      <div class="card-top">
+        <span class="card-icon">💰</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>Loan Calculator</h3>
+      <p>Estimate monthly payments, total interest costs, and view a complete amortization schedule.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/percentage.html" class="calc-card" data-cat="Math" data-keywords="percentage percent fraction math change increase decrease proportion">
+      <div class="card-top">
+        <span class="card-icon">📐</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Percentage Calculator</h3>
+      <p>Calculate percentage of a value, what percent a number is, or percentage increase/decrease.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/compound-interest.html" class="calc-card" data-cat="Finance" data-keywords="compound interest savings investment growth return inflation future value">
+      <div class="card-top">
+        <span class="card-icon">📈</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>Compound Interest</h3>
+      <p>Determine how your savings grow over time with compound interest and periodic deposits.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/tip.html" class="calc-card" data-cat="Finance" data-keywords="tip bill split split bill dinner restaurant gratuity custom service">
+      <div class="card-top">
+        <span class="card-icon">🍽️</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>Tip Calculator</h3>
+      <p>Instantly calculate the tip amount and split the total bill evenly among multiple people.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/age.html" class="calc-card" data-cat="Everyday" data-keywords="age date of birth born exact birthday calendar timer elapsed">
+      <div class="card-top">
+        <span class="card-icon">📅</span>
+        <span class="card-cat-badge" style="background:#FEE2E2;color:#991B1B">Everyday</span>
+      </div>
+      <h3>Age Calculator</h3>
+      <p>Compute your exact age in years, months, and days, and see total time elapsed since birth.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/unit-converter.html" class="calc-card" data-cat="Math" data-keywords="unit converter convert length metric imperial weight mass temperature volume area feet meters kg lbs Celsius">
+      <div class="card-top">
+        <span class="card-icon">📏</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Unit Converter</h3>
+      <p>Fast conversions between metric and imperial units for length, weight, area, volume, and temp.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/mortgage.html" class="calc-card" data-cat="Finance" data-keywords="mortgage house home loan pmi property tax interest payment escrow amortization">
+      <div class="card-top">
+        <span class="card-icon">🏠</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>Mortgage Calculator</h3>
+      <p>Estimate your monthly mortgage payment with property taxes, home insurance, and PMI.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/salary.html" class="calc-card" data-cat="Finance" data-keywords="salary hourly wage daily weekly pay converter job tax earnings compensation">
+      <div class="card-top">
+        <span class="card-icon">💼</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>Salary Calculator</h3>
+      <p>Convert between annual salary and hourly, daily, weekly, or monthly equivalent paychecks.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/roi.html" class="calc-card" data-cat="Finance" data-keywords="roi return on investment profit gain project business growth gain margin margin cost yield">
+      <div class="card-top">
+        <span class="card-icon">💹</span>
+        <span class="card-cat-badge" style="background:#FEF3C7;color:#92400E">Finance</span>
+      </div>
+      <h3>ROI Calculator</h3>
+      <p>Calculate return on investment for any purchase, venture, or project with annualized gains.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/calorie.html" class="calc-card" data-cat="Health" data-keywords="calorie daily target intake diet food macros loss gain maintenance health fitness bmr tdee">
+      <div class="card-top">
+        <span class="card-icon">🥗</span>
+        <span class="card-cat-badge" style="background:#D1FAE5;color:#065F46">Health</span>
+      </div>
+      <h3>Calorie Calculator</h3>
+      <p>Daily calorie needs based on goals (loss, gain, main) and activity level.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/water.html" class="calc-card" data-cat="Health" data-keywords="water intake hydration liquid drink cups liters health exercise body fluid">
+      <div class="card-top">
+        <span class="card-icon">💧</span>
+        <span class="card-cat-badge" style="background:#D1FAE5;color:#065F46">Health</span>
+      </div>
+      <h3>Water Intake</h3>
+      <p>Find out how much water you should drink each day to stay hydrated based on weight.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/heart-rate.html" class="calc-card" data-cat="Health" data-keywords="heart rate zones cardio training pulse beats per minute exercise target maximum age rest">
+      <div class="card-top">
+        <span class="card-icon">❤️</span>
+        <span class="card-cat-badge" style="background:#D1FAE5;color:#065F46">Health</span>
+      </div>
+      <h3>Heart Rate Zones</h3>
+      <p>Identify your optimal cardio training zones by age for fat burning, aerobic, and peak states.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/fraction.html" class="calc-card" data-cat="Math" data-keywords="fraction add subtract multiply divide simplify decimal math steps denominator numerator">
+      <div class="card-top">
+        <span class="card-icon">½</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Fraction Calculator</h3>
+      <p>Add, subtract, multiply, and divide fractions with full, step-by-step simplification instructions.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/quadratic.html" class="calc-card" data-cat="Math" data-keywords="quadratic solver equation formula solve roots complex real algebra equation">
+      <div class="card-top">
+        <span class="card-icon">📐</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Quadratic Solver</h3>
+      <p>Solve any ax² + bx + c = 0 quadratic equation and output real or complex roots instantly.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/prime.html" class="calc-card" data-cat="Math" data-keywords="prime checker number prime composite factors divisibility mathematics checking">
+      <div class="card-top">
+        <span class="card-icon">🔢</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Prime Checker</h3>
+      <p>Check if a number is prime, see its prime factorization, and list all positive factors.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/area.html" class="calc-card" data-cat="Math" data-keywords="area circle rectangle square triangle geometry volume shape space surface math dimensions">
+      <div class="card-top">
+        <span class="card-icon">📏</span>
+        <span class="card-cat-badge" style="background:#EDE9FE;color:#5B21B6">Math</span>
+      </div>
+      <h3>Area Calculator</h3>
+      <p>Calculate surface area for circles, rectangles, squares, triangles, trapezoids, and more.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/discount.html" class="calc-card" data-cat="Everyday" data-keywords="discount percent off final price savings coupon deal shopping retail cost tax">
+      <div class="card-top">
+        <span class="card-icon">🏷️</span>
+        <span class="card-cat-badge" style="background:#FEE2E2;color:#991B1B">Everyday</span>
+      </div>
+      <h3>Discount Calculator</h3>
+      <p>Find the final sale price, total savings, and post-tax cost after percentage discounts.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/fuel.html" class="calc-card" data-cat="Everyday" data-keywords="fuel cost trip distance mileage gas pricing highway commute commute car fuel economy">
+      <div class="card-top">
+        <span class="card-icon">⛽</span>
+        <span class="card-cat-badge" style="background:#FEE2E2;color:#991B1B">Everyday</span>
+      </div>
+      <h3>Fuel Cost</h3>
+      <p>Estimate trip fuel costs and total gallons required by entering distance and mpg/fuel prices.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/gpa.html" class="calc-card" data-cat="Everyday" data-keywords="gpa grade point average credits hours grades school semester cumulative collegiate">
+      <div class="card-top">
+        <span class="card-icon">🎓</span>
+        <span class="card-cat-badge" style="background:#FEE2E2;color:#991B1B">Everyday</span>
+      </div>
+      <h3>GPA Calculator</h3>
+      <p>Calculate your semester and cumulative Grade Point Average based on grades and credits.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/password.html" class="calc-card" data-cat="Everyday" data-keywords="password strength security checker entropy characters symbols letters protection check safety">
+      <div class="card-top">
+        <span class="card-icon">🔐</span>
+        <span class="card-cat-badge" style="background:#FEE2E2;color:#991B1B">Everyday</span>
+      </div>
+      <h3>Password Strength</h3>
+      <p>Test the strength, entropy, and estimate the crack time of your passwords locally.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/ohms-law.html" class="calc-card" data-cat="Science" data-keywords="ohms law voltage current resistance watt power amps volts electricity circuit science">
+      <div class="card-top">
+        <span class="card-icon">⚡</span>
+        <span class="card-cat-badge" style="background:#DBEAFE;color:#1E40AF">Science</span>
+      </div>
+      <h3>Ohm's Law</h3>
+      <p>Calculate voltage, current, resistance, or power instantly using Ohm's Law formulas.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/speed.html" class="calc-card" data-cat="Science" data-keywords="speed distance time velocity race pace trip duration travel physics conversion">
+      <div class="card-top">
+        <span class="card-icon">🚀</span>
+        <span class="card-cat-badge" style="background:#DBEAFE;color:#1E40AF">Science</span>
+      </div>
+      <h3>Speed Distance Time</h3>
+      <p>Determine speed, travel distance, or trip time by providing the other two variables.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/density.html" class="calc-card" data-cat="Science" data-keywords="density mass volume weight space science physics formulas chemistry matter">
+      <div class="card-top">
+        <span class="card-icon">🧪</span>
+        <span class="card-cat-badge" style="background:#DBEAFE;color:#1E40AF">Science</span>
+      </div>
+      <h3>Density Calculator</h3>
+      <p>Find density, mass, or volume by entering two parameters. Works with custom units.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/date-diff.html" class="calc-card" data-cat="Time" data-keywords="date difference days weeks months between target calendar deadline timer days since">
+      <div class="card-top">
+        <span class="card-icon">📅</span>
+        <span class="card-cat-badge" style="background:#F0FDF4;color:#166534">Time</span>
+      </div>
+      <h3>Date Difference</h3>
+      <p>Calculate the exact number of days, weeks, months, or years between two calendar dates.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+
+    <a href="calculators/time-zone.html" class="calc-card" data-cat="Time" data-keywords="time zone converter convert world time local meeting timezone zones offset UTC GMT pst est">
+      <div class="card-top">
+        <span class="card-icon">🌐</span>
+        <span class="card-cat-badge" style="background:#F0FDF4;color:#166534">Time</span>
+      </div>
+      <h3>Time Zone Converter</h3>
+      <p>Convert times between major world time zones. Great for scheduling international calls.</p>
+      <div class="card-footer">Use Calculator &nbsp;<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></div>
+    </a>
+  </div>
+  
+  <div class="no-results" id="noResultsBox">
+    <h3>No Calculators Found</h3>
+    <p>We couldn't find anything matching your query. Try searching for "loan", "BMI", "gpa", or "fraction".</p>
+  </div>
+</div>
+
+<footer>
+  <div style="margin-bottom: 16px; display: flex; justify-content: center; gap: 24px;">
+    <a href="about.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">About Us</a>
+    <a href="contact.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Contact</a>
+    <a href="privacy.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem; text-decoration: none;">Privacy Policy</a>
+  </div>
+  <p>© 2025 <a href="index.html">CalcSprint</a> · Speed-solving calculations instantly.</p>
+</footer>
+
+<script>
+let currentCat = 'all';
+let searchQuery = '';
+
+function filterCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(cat.toLowerCase()) || (cat === 'all' && btn.textContent === 'All'));
+  });
+  applyFilter();
+}
+
+function handleSearch(query) {
+  searchQuery = query.toLowerCase().trim();
+  applyFilter();
+}
+
+function applyFilter() {
+  const cards = document.querySelectorAll('.calc-card');
+  let visibleCount = 0;
+  
+  cards.forEach(card => {
+    const cardCat = card.getAttribute('data-cat');
+    const title = card.querySelector('h3').textContent.toLowerCase();
+    const desc = card.querySelector('p').textContent.toLowerCase();
+    const keywords = card.getAttribute('data-keywords').toLowerCase();
+    
+    const matchesCat = (currentCat === 'all' || cardCat === currentCat);
+    const matchesSearch = (searchQuery === '' || title.includes(searchQuery) || desc.includes(searchQuery) || keywords.includes(searchQuery));
+    
+    if (matchesCat && matchesSearch) {
+      card.style.display = 'flex';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  document.getElementById('gridCount').textContent = `Showing ${visibleCount} calculator${visibleCount === 1 ? '' : 's'}`;
+  document.getElementById('noResultsBox').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+// SPEED TICKER HERO SCRIPT
+const tickerTasks = [
+  { text: "BMI for 178cm, 72kg", steps: ["Analyzing metrics...", "Computing: 72 / (1.78 * 1.78)"], result: "BMI = 22.7 (Normal ✓)" },
+  { text: "Loan payment of $15,000 at 6.5%, 3 yrs", steps: ["Compiling rates...", "Solving payment formula..."], result: "$459.73 / month ✓" },
+  { text: "What is 18% of $84.50?", steps: ["Extracting percentage...", "Multiplying: 84.5 * 0.18"], result: "$15.21 ✓" },
+  { text: "Age for Birthday Dec 14, 1995", steps: ["Parsing date...", "Checking calendar offsets..."], result: "30 Years, 5 Months, 30 Days ✓" },
+  { text: "Future value of $5,000 at 8% compound monthly, 10 yrs", steps: ["Compounding 120 times...", "Adding monthly contributions..."], result: "$11,102.64 ✓" }
+];
+
+let taskIdx = 0;
+const typedTaskSpan = document.getElementById('typedTask');
+const loader = document.getElementById('tickerLoader');
+const loaderBar = document.getElementById('tickerLoaderBar');
+const tickerResult = document.getElementById('tickerResult');
+
+function runTicker() {
+  const current = tickerTasks[taskIdx];
+  typedTaskSpan.textContent = '';
+  tickerResult.textContent = '';
+  loader.style.display = 'none';
+  loaderBar.style.width = '0%';
+  
+  // 1. Typewriter input
+  let charIdx = 0;
+  function type() {
+    if (charIdx < current.text.length) {
+      typedTaskSpan.textContent += current.text.charAt(charIdx);
+      charIdx++;
+      setTimeout(type, 30);
+    } else {
+      // 2. Start calculation phase
+      setTimeout(calculate, 400);
+    }
+  }
+  
+  function calculate() {
+    loader.style.display = 'block';
+    loaderBar.style.width = '100%';
+    setTimeout(showResult, 600);
+  }
+  
+  function showResult() {
+    tickerResult.textContent = current.result;
+    // Highlight flash pulse
+    tickerResult.style.transform = 'scale(1.05)';
+    setTimeout(() => tickerResult.style.transform = 'scale(1)', 150);
+    
+    // Cycle index
+    taskIdx = (taskIdx + 1) % tickerTasks.length;
+    // Stay for 4.5 seconds then run next
+    setTimeout(runTicker, 4000);
+  }
+
+  type();
+}
+
+// Check if search query in URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const initialSearch = urlParams.get('q');
+if (initialSearch) {
+  document.getElementById('heroSearch').value = initialSearch;
+  handleSearch(initialSearch);
+}
+
+// Start ticker
+runTicker();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us – CalcSprint</title>
+  <meta name="description" content="Learn more about CalcSprint, our mission, values, and why we build the fastest, most reliable online calculators.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0F172A; --indigo:#6366F1; --indigo-light:#818CF8; --indigo-dim:#EEF2FF;
+      --bg:#F8FAFC; --white:#FFFFFF; --text:#0F172A; --muted:#64748B;
+      --border:#E2E8F0; --radius:14px;
+      --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    }
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    
+    /* Header */
+    header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .header-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-size:1.35rem;font-weight:800;text-decoration:none;color:var(--navy);letter-spacing:-.5px}
+    .logo span{color:var(--indigo)}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{font-size:.85rem;color:var(--muted);text-decoration:none;font-weight:500;transition:color .15s}
+    .nav-links a:hover{color:var(--indigo)}
+
+    /* Content Layout */
+    .container {max-width:800px;margin:48px auto;padding:0 24px}
+    .page-card {background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:40px;box-shadow:var(--shadow)}
+    
+    h1 {font-size:2.2rem;font-weight:800;letter-spacing:-1px;margin-bottom:16px;color:var(--navy)}
+    h1 span {color:var(--indigo)}
+    .subtitle {font-size:1.1rem;color:var(--muted);margin-bottom:32px;line-height:1.5}
+    
+    h2 {font-size:1.4rem;font-weight:700;margin:32px 0 16px 0;color:var(--navy);letter-spacing:-0.5px}
+    p {font-size:0.95rem;color:var(--text);margin-bottom:20px;line-height:1.7}
+    
+    /* Features Grid */
+    .features-list {margin:24px 0;display:flex;flex-direction:column;gap:16px}
+    .feature-item {display:flex;gap:16px;align-items:flex-start}
+    .feature-icon {font-size:1.5rem;background:var(--indigo-dim);color:var(--indigo);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;flex-shrink:0}
+    .feature-text h3 {font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+    .feature-text p {font-size:0.88rem;color:var(--muted);margin:0;line-height:1.5}
+
+    /* Footer */
+    footer{background:var(--navy);color:#94A3B8;padding:48px 24px;text-align:center;font-size:.85rem;border-top:1px solid rgba(255,255,255,0.05);margin-top:80px}
+    footer a{color:#fff;text-decoration:none;font-weight:600}
+    footer a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Calc<span>Sprint</span></a>
+    <div class="nav-links">
+      <a href="index.html#calculators">All Tools</a>
+      <a href="calculators/loan.html">Finance</a>
+      <a href="calculators/bmi.html">Health</a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-card">
+    <h1>About <span>CalcSprint</span></h1>
+    <p class="subtitle">Speed-solving calculations instantly. Free, interactive, and beautifully designed web calculators for everyone.</p>
+    
+    <p>At CalcSprint, we believe that math, finance, and health tools shouldn't be cluttered with ads, slow load times, or complicated inputs. Our mission is to deliver lightning-fast calculations using modern, responsive web technologies.</p>
+    
+    <h2>Our Core Values</h2>
+    <div class="features-list">
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-text">
+          <h3>Sprint-Level Speed</h3>
+          <p>All calculations are done instantly inside your browser. No server round-trips, no loading screens—just pure speed.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🎨</div>
+        <div class="feature-text">
+          <h3>Premium Design</h3>
+          <p>We believe utility tools should look and feel beautiful. Our interface is designed to be elegant, clean, and accessible on any device.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-text">
+          <h3>Privacy-First</h3>
+          <p>We do not store or track your inputs. Your calculations remain local to your browser, keeping your sensitive financial or health data safe.</p>
+        </div>
+      </div>
+    </div>
+    
+    <h2>Why CalcSprint?</h2>
+    <p>Whether you're estimating monthly mortgage payments, calculating interest on investments, determining your body mass index, or splitting a dinner bill, CalcSprint provides a smooth, frictionless user experience. We are continuously adding new calculators and refining our mathematical engines to cover your everyday needs.</p>
+  </div>
+</div>
+
+<footer>
+  <div style="margin-bottom: 16px; display: flex; justify-content: center; gap: 24px;">
+    <a href="about.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem;">About Us</a>
+    <a href="contact.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem;">Contact</a>
+    <a href="privacy.html" style="color: #94A3B8; font-weight: 500; font-size: 0.85rem;">Privacy Policy</a>
+  </div>
+  <p>© 2025 <a href="index.html">CalcSprint</a> · Speed-solving calculations instantly.</p>
+</footer>
+
+</body>
+</html>
